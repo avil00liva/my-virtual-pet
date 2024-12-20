@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+  Image,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
+import { StatusBar } from "expo-status-bar";
+
+const crab = require("./assets/crab.png");
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -35,14 +46,14 @@ export default function App() {
     requestPermissions();
   }, []);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const cancelScheduledNotifications = async () => {
       await Notifications.cancelAllScheduledNotificationsAsync();
       console.log("All scheduled notifications have been canceled.");
     };
 
     cancelScheduledNotifications();
-  }, []);
+  }, []); ESTO ES PARA CANCELAR LAS NOTIFICACIONES EN CASO DE USAR TIME_INTERVAL*/
 
   const addToCart = async () => {
     if (!permissionsGranted) {
@@ -63,10 +74,11 @@ export default function App() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Cart Notification App</Text>
-      <Text>Select Number of items:</Text>
-      <Picker
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      {/* <Text>Cart Notification App</Text>
+      <Text>Select Number of items:</Text> */}
+      {/* <Picker
         selectedValue={selectedItem}
         style={styles.picker}
         onValueChange={(itemValue) => setSelectedItem(itemValue)}
@@ -78,25 +90,70 @@ export default function App() {
 
       <TouchableOpacity style={styles.button} onPress={addToCart}>
         <Text style={styles.buttonText}>Add item to cart</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+
+      <Image source={crab} style={styles.pet} />
+
+      <View style={styles.petVital} />
+
+      <View style={styles.grid}>
+        <Pressable style={styles.pressable}>
+          <Text style={styles.text}>Alimentar</Text>
+        </Pressable>
+        <Pressable style={styles.pressable}>
+          <Text style={styles.text}>Jugar</Text>
+        </Pressable>
+        <Pressable style={styles.pressable}>
+          <Text style={styles.text}>Bañar</Text>
+        </Pressable>
+        <Pressable style={styles.pressable}>
+          <Text style={styles.text}>Dormir</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  picker: {
-    width: 200,
+  container: {
+    flex: 1, // Ocupa todo el espacio disponible
+    justifyContent: "center", // Centra verticalmente
+    alignItems: "center", // Centra horizontalmente
+    backgroundColor: "#f8f8f8", // Color de fondo opcional
+    paddingTop: 30,
+  },
+  grid: {
+    width: "80%", // Ajusta según tus necesidades
+    aspectRatio: 1, // Mantiene el contenedor cuadrado
+    flexDirection: "row", // Distribuye elementos en filas
+    flexWrap: "wrap", // Permite que los elementos pasen a la siguiente fila
+    justifyContent: "space-between", // Espaciado horizontal uniforme
+    alignContent: "space-between", // Espaciado vertical uniforme
+    gap: 6,
+  },
+  pressable: {
+    width: "48%", // Ajusta el tamaño de cada Pressable
+    aspectRatio: 1, // Mantiene los Pressable cuadrados
+    backgroundColor: "#4caf50", // Color de fondo de los botones
+    justifyContent: "center", // Centra el contenido del Pressable
+    alignItems: "center", // Centra el contenido del Pressable
+    borderRadius: 10, // Bordes redondeados
+  },
+  text: {
+    color: "white", // Color del texto
+    fontSize: 18, // Tamaño de la fuente
+    fontWeight: "bold", // Texto en negrita
+  },
+  pet: {
+    width: 320,
+    height: 320,
+    marginTop: 29,
+  },
+  petVital: {
+    width: 320,
     height: 50,
-  },
-  button: {
-    backgroundColor: "#007bff",
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    textAlign: "center",
+    backgroundColor: "#4caf50",
+    borderRadius: 20,
+    marginVertical: 12,
   },
 });
