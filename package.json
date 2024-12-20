@@ -15,7 +15,9 @@
     "react-native": "0.76.3",
     "expo-notifications": "~0.29.8",
     "expo-device": "~7.0.1",
-    "expo-constants": "~17.0.3"
+    "expo-constants": "~17.0.3",
+    "@react-native-picker/picker": "2.9.0",
+    "expo-dev-client": "~5.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

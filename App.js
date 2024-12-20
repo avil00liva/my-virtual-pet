@@ -1,64 +1,102 @@
-import React, { useEffect } from "react";
-import { View, Text, Button } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-    shouldPlaySound: false,
+    shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });
 
 export default function App() {
-  // Solicitar permisos de notificaciones
-  const requestPermissions = async () => {
-    if (Device.isDevice) {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== "granted") {
-        alert("Debes habilitar las notificaciones para recibir recordatorios.");
-      }
-    } else {
-      alert("Las notificaciones no funcionan en un simulador/emulador.");
-    }
-  };
+  const [selectedItem, setSelectedItem] = useState(1);
+  const [permissionsGranted, setPermissionsGranted] = useState(false);
 
-  const scheduleNotificationEvery2Hours = async () => {
-    await Notifications.cancelAllScheduledNotificationsAsync();
+  useEffect(() => {
+    const requestPermissions = async () => {
+      if (Device.isDevice) {
+        const { status: existingStatus } =
+          await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== "granted") {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        setPermissionsGranted(finalStatus === "granted");
+      } else {
+        console.log("Must use a physical device for Push Notifications");
+      }
+    };
+
+    requestPermissions();
+  }, []);
+
+  useEffect(() => {
+    const cancelScheduledNotifications = async () => {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+      console.log("All scheduled notifications have been canceled.");
+    };
+
+    cancelScheduledNotifications();
+  }, []);
+
+  const addToCart = async () => {
+    if (!permissionsGranted) {
+      console.log("Notifications not granted. Please enable them in settings");
+      return;
+    }
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "¡Tu mascota tiene hambre! 🐾",
-        body: "Recuerda alimentarla para que siga feliz.",
+        title: "Cart Reminder",
+        body: `${selectedItem} item(s) have in your cart. Please proceed to checkout`,
+        sound: "default",
       },
-      trigger: { seconds: 120, repeats: true }, // Cada 2 horas
+      trigger: new Date(Date.now() + 30 * 1000),
+      /*{ type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 2, 
+      }*/
     });
   };
 
-  useEffect(() => {
-    const setup = async () => {
-      await requestPermissions();
-      await scheduleNotificationEvery2Hours();
-    };
-    setup();
-  }, []);
-
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Tu mascota virtual</Text>
-      <Button
-        title="Programar notificaciones recurrentes"
-        onPress={scheduleNotificationEvery2Hours}
-      />
-      <View style={{ marginTop: 29 }}>
-        <Button
-          title="Cancelar todas las notificaciones"
-          onPress={async () => {
-            await Notifications.cancelAllScheduledNotificationsAsync();
-            Alert.alert("Notificaciones canceladas");
-          }}
-        />
-      </View>
+      <Text>Cart Notification App</Text>
+      <Text>Select Number of items:</Text>
+      <Picker
+        selectedValue={selectedItem}
+        style={styles.picker}
+        onValueChange={(itemValue) => setSelectedItem(itemValue)}
+      >
+        {[...Array(10)].map((_, i) => (
+          <Picker.Item key={i} value={i + 1} label={`${i + 1}`} />
+        ))}
+      </Picker>
+
+      <TouchableOpacity style={styles.button} onPress={addToCart}>
+        <Text style={styles.buttonText}>Add item to cart</Text>
+      </TouchableOpacity>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  picker: {
+    width: 200,
+    height: 50,
+  },
+  button: {
+    backgroundColor: "#007bff",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    textAlign: "center",
+  },
+});

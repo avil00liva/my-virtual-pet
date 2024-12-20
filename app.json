@@ -4,6 +4,16 @@
     "slug": "my-virtual-pet",
     "version": "1.0.0",
     "orientation": "portrait",
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "enableBackgroundRemoteNotifications": true
+        }
+      ]
+    ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -19,10 +29,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.agustinoliexpo.myvirtualpet"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "feb9eede-4942-4c62-8f22-b95fa6ddb5e6"
+      }
     }
   }
 }
